@@ -2,6 +2,12 @@
     fill: #ccc;
     stroke: #fff;
     stroke-width: 2px;
+    cursor: pointer;
+}
+
+.node text {
+  font: 9px helvetica;
+  margin-left: 5px;
 }
 
 .link {
