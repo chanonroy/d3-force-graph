@@ -11,16 +11,16 @@ var color = d3.scale.category10();
 
 // Links Array
 var links = [
-    { source: 'Cat', target: 'Animal', value: 0.3 },
+    { source: 'Cat', target: 'Animal', value: 100 },
     { source: 'Dog', target: 'Animal', value: 4 },
-    { source: 'Wolf', target: 'Animal', value: 6 },
+    { source: 'Wolf', target: 'Animal', value: 60 },
     { source: 'Kitten', target: 'Animal', value: 6 },
     { source: 'Whale', target: 'Animal', value: 6 },
     { source: 'Max', target: 'Cat', value: 3 },
     { source: 'Fred', target: 'Cat', value: 6 },
     { source: 'George', target: 'Cat', value: 6 },
     { source: 'Marty', target: 'Wolf', value: 6 },
-    { source: 'Vector', target: 'Wolf', value: 16 },
+    { source: 'Vector', target: 'Wolf', value: 100 },
     { source: 'Spike', target: 'Dog', value: 6 },
     { source: 'Bruce', target: 'Whale', value: 6 },
     { source: 'George', target: 'Wolf', value: 6 },
@@ -47,7 +47,9 @@ links.forEach(function(link) {
     // link.value = +link.value;
 });
 
-console.log(JSON.stringify(nodes));
+function rando() {
+  return 100;
+}
 
 // Setup Canvas
 var svg = d3.select('.container').append('svg')
@@ -62,7 +64,7 @@ var force = d3.layout.force()
     .charge(config.charge)
     .gravity(config.gravity)
     .on("tick", tick)
-    .linkDistance(config.linkDistance)
+    .linkDistance(config.linkDistance) // function(d) { return  d.value; }
     .start();
 
 // EDGES
@@ -83,7 +85,8 @@ var node = svg.selectAll('.node')
 node.append("circle")
   .attr('class', 'node')
   .attr('r', function(d) { return 10 * d.group; })
-  .style("fill", function(d) { return color(d.group); });
+  .style("fill", function(d) { return color(d.group); })
+  .on('dblclick', connectedNodes);
 
 node.append("text")
   .attr("x", -20) // TODO, make function here to change based on group
@@ -101,4 +104,54 @@ function tick(e) {
       .attr('x2', function(d) { return d.target.x; })
       .attr('y2', function(d) { return d.target.y; });
 
+}
+
+// ------------- UTILITY ------------------------------
+
+//Toggle stores whether the highlighting is on
+var toggle = 0;
+
+//Create an array logging what is connected to what
+var linkedByIndex = {};
+for (i = 0; i < nodes.length; i++) {
+    linkedByIndex[i + "," + i] = 1;
+}
+
+links.forEach(function (d) {
+    linkedByIndex[d.source.index + "," + d.target.index] = 1;
+});
+
+//This function looks up whether a pair are neighbours
+function neighboring(a, b) {
+    return linkedByIndex[a.index + "," + b.index];
+}
+
+function connectedNodes() {
+
+    if (toggle === 0) {
+        //Reduce the opacity of all but the neighbouring nodes
+        d = d3.select(this).node().__data__;
+
+        node.style("opacity", function (o) { // If neighboring, keep opacity on.
+            if (o.name === d.name) { // if is clicked node
+              return 1;
+            }
+            if(o.group === 3) { // if middle node
+              return 1;
+            }
+            return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
+        });
+
+        link.style("opacity", function (o) {
+            return d.index==o.source.index | d.index==o.target.index ? 1 : 0.1;
+        });
+        //Reduce the op
+        toggle = 1;
+
+    } else {
+        //Put them back to opacity=1
+        node.style("opacity", 1);
+        link.style("opacity", 1);
+        toggle = 0;
+    }
 }
