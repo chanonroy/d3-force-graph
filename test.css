@@ -1,14 +1,19 @@
 .container {
   width: 1200px;
   margin: 0 auto;
-  background-color: rgb(223, 225, 226);
+  /*background-color: rgb(223, 225, 226);*/
 }
 
 .node {
     fill: #ccc;
     stroke: #fff;
-    stroke-width: 2px;
+    stroke-width: 1px;
     cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.node:hover {
+    fill: gold !important;
 }
 
 .node text {
@@ -18,5 +23,14 @@
 
 .link {
     stroke: lightgrey;
-    stroke-width: 3px;
+    stroke-width: 2px;
+    opacity: 0.3;
+}
+
+.d3-tip {
+  line-height: 1;
+  color: white;
+  background-color: grey;
+  padding: 5px 20px;
+  border-radius: 5px;
 }

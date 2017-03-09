@@ -48,10 +48,6 @@ links.forEach(function(link) {
     // link.value = +link.value;
 });
 
-function rando() {
-  return 100;
-}
-
 // Setup Canvas
 var svg = d3.select('.container').append('svg')
     .attr('width', width)
@@ -76,6 +72,14 @@ var link = svg.selectAll('.link')
 
 // ----------------------------------------------
 
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function (d) {
+    return  d.name + "";
+});
+svg.call(tip);
+
 // NODES
 var node = svg.selectAll('.node')
   .data(force.nodes())
@@ -86,14 +90,25 @@ var node = svg.selectAll('.node')
 node.append("circle")
   .attr('class', 'node')
   .attr('r', function(d) { return 10 * d.group; })
+  .style("stroke", "transparent")
   .style("fill", function(d) { return color(d.group); })
-  .on('dblclick', connectedNodes);
+  .on('dblclick', connectedNodes)
+  .on('mouseover', tip.show)
+  .on('mouseout', tip.hide);
 
-node.append("text")
-  .attr("x", -20) // TODO, make function here to change based on group
-  .attr("y", -40)
-  .attr("dy", ".35em")
-  .text(function(d) { return d.name; });
+// node.append("text")
+//   .attr("y", function(d) {
+//     if (d.group === 1) {
+//       return -20;
+//     } else if (d.group === 2) {
+//       return -25;
+//     } else {
+//       return -35;
+//     }
+//   })
+//   .attr("dy", ".35em")
+//   .style("opacity", function(d) { return d.group === 1 ? 0 : 1; })
+//   .text(function(d) { return d.name; });
 
 // EVENT HANDLER
 function tick(e) {
@@ -134,12 +149,7 @@ function connectedNodes() {
         d = d3.select(this).node().__data__;
 
         node.style("opacity", function (o) { // If neighboring, keep opacity on.
-            if (o.name === d.name) { // if is clicked node
-              return 1;
-            }
-            // if(o.group === 3) { // if middle node
-            //   return 1;
-            // }
+            if (o.name === d.name) { return 1; }  // if node is the one being clickeds
             return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
         });
 
@@ -152,7 +162,7 @@ function connectedNodes() {
     } else {
         //Put them back to opacity=1
         node.style("opacity", 1);
-        link.style("opacity", 1);
+        link.style("opacity", 0.3);
         toggle = 0;
     }
 }
