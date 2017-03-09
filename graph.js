@@ -26,7 +26,8 @@ var links = [
     { source: 'George', target: 'Wolf', value: 6 },
     { source: 'Billy', target: 'Cat', value: 5},
     { source: 'Billy', target: 'Dog', value: 5},
-    { source: 'Billy', target: 'Wolf', value: 5}
+    { source: 'Billy', target: 'Wolf', value: 5},
+    { source: 'Spike', target: 'Animal', value: 3}
 ];
 
 // Create empty nodes array (need to append fixed category items first)
@@ -136,9 +137,9 @@ function connectedNodes() {
             if (o.name === d.name) { // if is clicked node
               return 1;
             }
-            if(o.group === 3) { // if middle node
-              return 1;
-            }
+            // if(o.group === 3) { // if middle node
+            //   return 1;
+            // }
             return neighboring(d, o) | neighboring(o, d) ? 1 : 0.1;
         });
 
